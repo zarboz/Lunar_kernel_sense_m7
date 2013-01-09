@@ -34,6 +34,9 @@ modules.builtin
 *.patch
 *.gcno
 build_m7_kernel.sh
+<<<<<<< HEAD
+=======
+>>>>>>> 27a75af... thermal: update upstream msm_thermal with 3-phase control
 
 #
 # Top-level generic files
