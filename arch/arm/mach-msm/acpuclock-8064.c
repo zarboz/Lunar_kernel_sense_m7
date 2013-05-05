@@ -701,3 +701,46 @@ static int __init acpuclk_8064_init(void)
 				     acpuclk_8064_probe);
 }
 device_initcall(acpuclk_8064_init);
+
+#ifdef CONFIG_CMDLINE_OPTIONS
+uint32_t __init acpu_check_khz_value(unsigned long khz)
+{
+	struct acpu_level *f;
+
+	if (khz > 2106000)
+		return CONFIG_MSM_CPU_FREQ_MAX;
+
+	if (khz < 192000)
+		return CONFIG_MSM_CPU_FREQ_MIN;
+
+	for (f = tbl_PVS0_1700MHz,tbl_PVS1_1700MHz,tbl_PVS2_1700MHz,tbl_PVS3_1700MHz,tbl_PVS4_1700MHz,tbl_PVS5_1700MHz,tbl_PVS6_1700MHz; f->speed.khz != 0; f++) {
+		if (khz < 192000) {
+			if (f->speed.khz == (khz*1000))
+				return f->speed.khz;
+			if ((khz*1000) > f->speed.khz) {
+				f++;
+				if ((khz*1000) < f->speed.khz) {
+					f--;
+					return f->speed.khz;
+				}
+				f--;
+			}
+		}
+		if (f->speed.khz == khz) {
+			return 1;
+		}
+		if (khz > f->speed.khz) {
+			f++;
+			if (khz < f->speed.khz) {
+				f--;
+				return f->speed.khz;
+			}
+			f--;
+		}
+	}
+
+	return 0;
+}
+EXPORT_SYMBOL(acpu_check_khz_value);
+/* end cmdline_khz */
+#endif
