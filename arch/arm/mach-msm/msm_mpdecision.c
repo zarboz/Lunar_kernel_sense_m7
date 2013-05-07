@@ -100,7 +100,7 @@ static struct msm_mpdec_tuners {
     unsigned int max_cpus;
     unsigned int min_cpus;
 #ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-    bool boost_enabled;
+    bool boost_cpumin_on_input_event;
     unsigned int boost_time;
     unsigned long int boost_freq[4];
 #endif
@@ -113,7 +113,7 @@ static struct msm_mpdec_tuners {
     .max_cpus = CONFIG_NR_CPUS,
     .min_cpus = 1,
 #ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-    .boost_enabled = true,
+    .boost_cpumin_on_input_event = true,
     .boost_time = MSM_MPDEC_BOOSTTIME,
     .boost_freq = {
         MSM_MPDEC_BOOSTFREQ_CPU0,
@@ -377,7 +377,6 @@ static void unboost_cpu(int cpu) {
                 pr_info(MPDEC_TAG"un boosted cpu%i to %lu", cpu, per_cpu(msm_mpdec_cpudata, cpu).norm_min_freq);
 #endif
                 per_cpu(msm_mpdec_cpudata, cpu).is_boosted = false;
-                per_cpu(msm_mpdec_cpudata, cpu).revib_wq_running = false;
                 update_cpu_min_freq(cpu_policy, cpu, per_cpu(msm_mpdec_cpudata, cpu).norm_min_freq);
                 cpufreq_cpu_put(cpu_policy);
                 mutex_unlock(&per_cpu(msm_mpdec_cpudata, cpu).unboost_mutex);
@@ -392,6 +391,7 @@ static void msm_mpdec_revib_work_thread(struct work_struct *work) {
     int cpu = smp_processor_id();
 
     if (ktime_to_ms(ktime_get()) > per_cpu(msm_mpdec_cpudata, cpu).boost_until) {
+        per_cpu(msm_mpdec_cpudata, cpu).revib_wq_running = false;
         unboost_cpu(cpu);
     } else {
         queue_delayed_work_on(cpu,
@@ -445,7 +445,7 @@ static void mpdec_input_event(struct input_handle *handle, unsigned int type,
         unsigned int code, int value) {
     int i = 0;
 
-    if (!msm_mpdec_tuners_ins.boost_enabled)
+    if (!msm_mpdec_tuners_ins.boost_cpumin_on_input_event)
         return;
 
     if (!is_screen_on)
@@ -597,10 +597,6 @@ show_one(pause, pause);
 show_one(scroff_single_core, scroff_single_core);
 show_one(min_cpus, min_cpus);
 show_one(max_cpus, max_cpus);
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-show_one(boost_enabled, boost_enabled);
-show_one(boost_time, boost_time);
-#endif
 
 #define show_one_twts(file_name, arraypos)                              \
 static ssize_t show_##file_name                                         \
@@ -860,67 +856,6 @@ static ssize_t store_enabled(struct kobject *a, struct attribute *b,
     return count;
 }
 
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-static ssize_t store_boost_enabled(struct kobject *a, struct attribute *b,
-                   const char *buf, size_t count)
-{
-    unsigned int input;
-    int ret;
-    ret = sscanf(buf, "%u", &input);
-    if (ret != 1)
-        return -EINVAL;
-
-    msm_mpdec_tuners_ins.boost_enabled = input;
-
-    return count;
-}
-
-static ssize_t store_boost_time(struct kobject *a, struct attribute *b,
-                   const char *buf, size_t count)
-{
-    unsigned int input;
-    int ret;
-    ret = sscanf(buf, "%u", &input);
-    if (ret != 1)
-        return -EINVAL;
-
-    msm_mpdec_tuners_ins.boost_time = input;
-
-    return count;
-}
-
-static ssize_t show_boost_freqs(struct kobject *a, struct attribute *b,
-                   char *buf)
-{
-    ssize_t len = 0;
-    int cpu = 0;
-
-    for_each_present_cpu(cpu) {
-        len += sprintf(buf + len, "%lu\n", per_cpu(msm_mpdec_cpudata, cpu).boost_freq);
-    }
-    return len;
-}
-static ssize_t store_boost_freqs(struct kobject *a, struct attribute *b,
-                   const char *buf, size_t count)
-{
-    int i = 0;
-    unsigned int cpu = 0;
-    long unsigned int hz = 0;
-    const char *chz = NULL;
-
-    for (i=0; i<count; i++) {
-        if (buf[i] == ' ') {
-            sscanf(&buf[(i-1)], "%u", &cpu);
-            chz = &buf[(i+1)];
-        }
-    }
-    sscanf(chz, "%lu", &hz);
-    per_cpu(msm_mpdec_cpudata, cpu).boost_freq = hz;
-    return count;
-}
-define_one_global_rw(boost_freqs);
-#endif
-
 define_one_global_rw(startdelay);
 define_one_global_rw(delay);
 define_one_global_rw(pause);
@@ -929,10 +864,6 @@ define_one_global_rw(idle_freq);
 define_one_global_rw(min_cpus);
 define_one_global_rw(max_cpus);
 define_one_global_rw(enabled);
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-define_one_global_rw(boost_enabled);
-define_one_global_rw(boost_time);
-#endif
 
 static struct attribute *msm_mpdec_attributes[] = {
     &startdelay.attr,
@@ -959,11 +890,6 @@ static struct attribute *msm_mpdec_attributes[] = {
     &nwns_threshold_5.attr,
     &nwns_threshold_6.attr,
     &nwns_threshold_7.attr,
-#ifdef CONFIG_MSM_MPDEC_INPUTBOOST_CPUMIN
-    &boost_freqs.attr,
-    &boost_enabled.attr,
-    &boost_time.attr,
-#endif
     NULL
 };
 
