@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Path to build your kernel
-  k=~/kernel/sensekk
+  k=~/kernel/project/m7vzw/Lunar_kernel_sense_m7
 # Directory for the any kernel updater
   t=$k/packages
 # Date to add to zip
@@ -27,7 +27,7 @@
   m=$k/out/$c/system/lib/modules
   z=$c-$today
 
-TOOLCHAIN=/home/forrest/kernel/arm-eabi-4.7/bin/arm-eabi-
+TOOLCHAIN=/home/zarboz/android-toolchain-eabi/bin/arm-linux-androideabi-
 export ARCH=arm
 export SUBARCH=arm
 

@@ -32,6 +32,7 @@ modules.builtin
 *.lzo
 *.patch
 *.gcno
+build_m7_kernel.sh
 
 #
 # Top-level generic files
