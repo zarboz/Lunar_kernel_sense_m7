@@ -1029,7 +1029,7 @@ static int override_release(char __user *release, size_t len)
 		char buf[65] = { 0 };
 		int ndots = 0;
 		unsigned v;
-		size_t copy;
+        size_t copy;
 
 		while (*rest) {
 			if (*rest == '.' && ++ndots >= 3)
