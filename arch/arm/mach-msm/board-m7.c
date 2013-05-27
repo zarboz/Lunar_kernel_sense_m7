@@ -241,7 +241,7 @@ enum {
 int set_two_phase_freq(int cpufreq);
 #endif
 
-int set_input_event_min_freq_by_cpu(int cpu_nr, int cpufreq);
+//int set_input_event_min_freq_by_cpu(int cpu_nr, int cpufreq);
 
 #ifdef CONFIG_KERNEL_PMEM_EBI_REGION
 static unsigned pmem_kernel_ebi1_size = MSM_PMEM_KERNEL_EBI1_SIZE;
@@ -5620,10 +5620,10 @@ static void __init m7_cdp_init(void)
         if(!cpu_is_krait_v1())
                 set_two_phase_freq(1134000);
 #endif
-	set_input_event_min_freq_by_cpu(1, 1134000);
-	set_input_event_min_freq_by_cpu(2, 1026000);
-	set_input_event_min_freq_by_cpu(3, 810000);
-	set_input_event_min_freq_by_cpu(4, 810000);
+	//set_input_event_min_freq_by_cpu(1, 1134000);
+	//set_input_event_min_freq_by_cpu(2, 1026000);
+	//set_input_event_min_freq_by_cpu(3, 810000);
+	//set_input_event_min_freq_by_cpu(4, 810000);
 
 	
 	
