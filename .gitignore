@@ -34,9 +34,6 @@ modules.builtin
 *.patch
 *.gcno
 *.img
-<<<<<<< HEAD
-=======
->>>>>>> 27a75af... thermal: update upstream msm_thermal with 3-phase control
 #
 # Top-level generic files
 #
