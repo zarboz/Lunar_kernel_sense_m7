@@ -132,7 +132,8 @@
 
 #define MSM_PMEM_ADSP_SIZE         0x8600000
 #define MSM_PMEM_AUDIO_SIZE        0x4CF000
-#define MSM_PMEM_SIZE              0x0 
+
+#define MSM_PMEM_SIZE 0x0 
 
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 #define HOLE_SIZE		0x20000
