@@ -45,7 +45,7 @@ build_m7_kernel.sh
 /System.map
 /Module.markers
 /Module.symvers
-
+out/
 #
 # Debian directory (make deb-pkg)
 #
