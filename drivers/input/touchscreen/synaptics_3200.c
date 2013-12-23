@@ -3458,7 +3458,7 @@ static int synaptics_ts_suspend(struct i2c_client *client, pm_message_t mesg)
 		ts->psensor_phone_enable = 1;
 
 	if (ts->packrat_number < SYNAPTICS_FW_NOCAL_PACKRAT)
-		printk(KERN_INFO "[TP][PWR][STATE] get power key state = %d\n", getPowerKeyState());
+	//	printk(KERN_INFO "[TP][PWR][STATE] get power key state = %d\n", getPowerKeyState());
 
 #ifdef CONFIG_TOUCHSCREEN_SYNAPTICS_SWEEP2WAKE
 	if (s2w_switch == 2 || s2w_switch == 0 ) {
@@ -3472,7 +3472,7 @@ static int synaptics_ts_suspend(struct i2c_client *client, pm_message_t mesg)
 					get_address_base(ts, 0x01, CONTROL_BASE), 0x01); 
 			if (ret < 0)
 				i2c_syn_error_handler(ts, ts->i2c_err_handler_en, "sleep: 0x01", __func__);
-		} else {
+		} /*else {
 			if (ts->psensor_status > 0 && getPowerKeyState() == 0) {
 				ret = i2c_syn_write_byte_data(client,
 					get_address_base(ts, 0x01, CONTROL_BASE), 0x02); 
@@ -3484,7 +3484,7 @@ static int synaptics_ts_suspend(struct i2c_client *client, pm_message_t mesg)
 				if (ret < 0)
 					i2c_syn_error_handler(ts, ts->i2c_err_handler_en, "sleep: 0x01", __func__);
 			}
-		}
+		}*/
 		if (ts->lpm_power)
 			ts->lpm_power(1);
 	}
