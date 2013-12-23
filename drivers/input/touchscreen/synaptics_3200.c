@@ -2021,14 +2021,16 @@ static void sweep2wake_func(int button_id, cputime64_t strigger_time) {
 
 		if (s2w_switch == 1 && (s2w_hist[1] == 1 && s2w_hist[0] == 2) && ((s2w_time[0]-s2w_time[1]) < S2W_TIMEOUT)) {
                         printk(KERN_INFO"[S2W]: OFF->ON\n");
-
+						vibrate(15);
                         sweep2wake_pwrtrigger();
+						
 		}
 
         } else if (!scr_suspended) {
 
 		if ((s2w_hist[1] == 2 && s2w_hist[0] == 1) && ((s2w_time[0]-s2w_time[1]) < S2W_TIMEOUT)) {
                         printk(KERN_INFO"[S2W]: ON->OFF\n");
+						vibrate(15);
                         sweep2wake_pwrtrigger();
 		}
 	}
