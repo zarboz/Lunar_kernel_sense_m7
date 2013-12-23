@@ -933,16 +933,11 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.igauge.set_lower_voltage_alarm_threshold =
 						pm8xxx_batt_lower_alarm_threshold_set,
 	
-<<<<<<< HEAD
-#ifdef CONFIG_THERMAL_TSENS8960
-	.get_thermal_sensor_temp = tsens_get_sensor_temp,
-#endif
-	
+
 #ifdef CONFIG_HTC_PNPMGR
 	.notify_pnpmgr_charging_enabled = pnpmgr_battery_charging_enabled,
 #endif 
-=======
->>>>>>> fa010b3... msm_thermal: 3-phase thermal throttling
+
 };
 static struct platform_device htc_battery_pdev = {
 	.name = "htc_battery",
