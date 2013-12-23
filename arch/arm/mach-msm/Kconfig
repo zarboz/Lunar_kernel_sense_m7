@@ -2941,5 +2941,12 @@ config IOEXTENDER
         bool "Enable IOEXTENDER feature"
 	help
 	 To support IOEXTENDER feature
+
+config CMDLINE_OPTIONS
+	default y
+	bool "cmdline options to help max/minkhz and s2w startup options"
+	help
+		To support misc interfacing options
+
 endif
 
