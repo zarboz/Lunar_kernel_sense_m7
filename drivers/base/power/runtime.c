@@ -952,14 +952,8 @@ static int rpm_resume(struct device *dev, int rpmflags)
 	wake_up_all(&dev->power.wait_queue);
 	if ( log_enable == 1 )
 		dev_info(dev, "%s[%d] wake_up_all-\n", __func__, __LINE__);
-<<<<<<< HEAD
 	if (!retval) {
-=======
-#if defined(CONFIG_MACH_DUMMY) || defined(CONFIG_MACH_M7_UL) || defined(CONFIG_MACH_DUMMY)
-	dev->power.runtime_rpm_resume_footprint2 = 25;
-#endif
-	if (!retval >= 0) {
->>>>>>> 9d4c444... Patching upstream 3.0.11->3.0.12
+
 		if ( log_enable == 1 )
 			dev_info(dev, "%s[%d] rpm_idle+\n", __func__, __LINE__);
 		rpm_idle(dev, RPM_ASYNC);

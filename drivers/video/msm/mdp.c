@@ -583,7 +583,7 @@ static void mdp_lut_status_restore(void)
 	}
 }
 
-static void mdp_lut_status_backup(void)
+/*static void mdp_lut_status_backup(void)
 {
 	uint32_t status = inpdw(MDP_BASE + 0x90070) & 0x7;
 	if (status)
@@ -591,7 +591,7 @@ static void mdp_lut_status_backup(void)
 	else
 		mdp_lut_resume_needed = 0;
 }
-
+*/
 static int mdp_lut_update_nonlcdc(struct fb_info *info, struct fb_cmap *cmap)
 {
 	int ret;
