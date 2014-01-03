@@ -583,7 +583,7 @@ static void mdp_lut_status_restore(void)
 	}
 }
 
-/*static void mdp_lut_status_backup(void)
+static void mdp_lut_status_backup(void)
 {
 	uint32_t status = inpdw(MDP_BASE + 0x90070) & 0x7;
 	if (status)
@@ -591,7 +591,7 @@ static void mdp_lut_status_restore(void)
 	else
 		mdp_lut_resume_needed = 0;
 }
-*/
+
 static int mdp_lut_update_nonlcdc(struct fb_info *info, struct fb_cmap *cmap)
 {
 	int ret;
@@ -649,7 +649,6 @@ int mdp_preset_lut_update_lcdc(struct fb_cmap *cmap, uint32_t *internal_lut)
 
 	mdp_pipe_ctrl(MDP_CMD_BLOCK, MDP_BLOCK_POWER_ON, FALSE);
 	mdp_clk_ctrl(1);
-	mdp_lut_status_backup();
 
 	for (i = 0; i < cmap->len; i++) {
 		r = lut2r(internal_lut[i]);
@@ -667,7 +666,7 @@ int mdp_preset_lut_update_lcdc(struct fb_cmap *cmap, uint32_t *internal_lut)
 				 ((r & 0xff) << 16)));
 	}
 
-	
+
 	out = inpdw(MDP_BASE + 0x90070) & ~((0x1 << 10) | 0x7);
 	MDP_OUTP(MDP_BASE + 0x90070, (mdp_lut_i << 10) | 0x7 | out);
 	mdp_clk_ctrl(0);
@@ -676,7 +675,6 @@ int mdp_preset_lut_update_lcdc(struct fb_cmap *cmap, uint32_t *internal_lut)
 
 	return 0;
 }
-EXPORT_SYMBOL(mdp_preset_lut_update_lcdc);
 EXPORT_SYMBOL(mdp_preset_lut_update_lcdc);
 #endif
 
@@ -2309,6 +2307,7 @@ static int mdp_off(struct platform_device *pdev)
 	complete_all(&vsync_cntrl.vsync_wait);
 
 	mdp_clk_ctrl(1);
+	mdp_lut_status_backup();
 
 	ret = panel_next_early_off(pdev);
 
