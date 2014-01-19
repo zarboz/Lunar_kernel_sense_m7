@@ -1029,7 +1029,7 @@ static struct mutex set_cabc_mutex;
 void m7_set_cabc (struct msm_fb_data_type *mfd, int mode);
 #endif
 static unsigned int pwm_min = 6;
-static unsigned int pwm_default = 81 ;
+static unsigned int pwm_default = 75 ;
 static unsigned int pwm_max = 255;
 static atomic_t lcd_backlight_off;
 
