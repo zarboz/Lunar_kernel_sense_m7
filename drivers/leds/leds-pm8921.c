@@ -121,7 +121,7 @@ void pm8xxx_led_current_set_for_key(int brightness_key)
 	static u8 level, register_key;
 
 	LED_INFO("%s brightness_key: %d\n", __func__,brightness_key);
-	printk("[BB] current_set_for_key  %d \n", brightness_key);
+	//printk("[BB] current_set_for_key  %d \n", brightness_key);
 
 	if (brightness_key) {
 		flag_hold_virtual_key = 1;
@@ -265,7 +265,7 @@ static void pm8xxx_led_current_set(struct led_classdev *led_cdev, enum led_brigh
 	// checking for buttons device
 	if (led_cdev_buttons == led_cdev)
 	{
-		printk("[BB] led_current_set %d \n", brightness);
+		//printk("[BB] led_current_set %d \n", brightness);
 		if (brightness>0)
 		{
 			// screen turning off together with buttons led
@@ -285,7 +285,7 @@ static void pm8xxx_buttons_blink(int on)
 {
 	if (on > 0)
 	{
-		printk("[BB] blink on  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
+		//printk("[BB] blink on  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
 		if (buttons_led_is_on == 1) return; // already lit, dont blink
 		if (touchscreen_is_on() == 1) return; // touchscreen is on, dont blink
 		buttons_led_is_blinking = 1;
@@ -293,7 +293,7 @@ static void pm8xxx_buttons_blink(int on)
 		pm8xxx_led_current_set_flagged(led_cdev_buttons, 1, 1);
 	} else
 	{
-		printk("[BB] blink off  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
+		//printk("[BB] blink off  screen: %d j: %lu \n", touchscreen_is_on(), jiffies);
 		if (buttons_led_is_blinking == 0) return;
 		buttons_led_is_blinking = 0;
 		if (touchscreen_is_on() == 1 && buttons_turning_on_with_screen_on == 1) return; // touchscreen is on, button light already override the blinking, dont turn off
@@ -484,7 +484,7 @@ static ssize_t pm8xxx_led_blink_store(struct device *dev,
 	ldata = container_of(led_cdev, struct pm8xxx_led_data, cdev);
 
 	LED_INFO("%s: bank %d blink %d sync %d\n", __func__, ldata->bank, val, ldata->led_sync);
-	printk("[BB] blink value: %d\n",val);
+	//printk("[BB] blink value: %d\n",val);
 
 	switch (val) {
 	case BLINK_STOP:
