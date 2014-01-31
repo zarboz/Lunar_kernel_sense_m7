@@ -252,12 +252,6 @@ static struct lcdc_platform_data dtv_pdata = {
 };
 #endif
 
-static int mdp_core_clk_rate_table[] = {
-	200000000,
-	200000000,
-	200000000,
-	200000000,
-};
 struct mdp_reg *mdp_gamma = NULL;
 int mdp_gamma_count = 0;
 struct mdp_reg mdp_gamma_jdi[] = {
@@ -792,9 +786,6 @@ int m7wl_mdp_gamma(void)
 
 static struct msm_panel_common_pdata mdp_pdata = {
 	.gpio = MDP_VSYNC_GPIO,
-	.mdp_core_clk_rate = 200000000,
-	.mdp_core_clk_table = mdp_core_clk_rate_table,
-	.num_mdp_clk = ARRAY_SIZE(mdp_core_clk_rate_table),
 #ifdef CONFIG_MSM_BUS_SCALING
 	.mdp_bus_scale_table = &mdp_bus_scale_pdata,
 #endif
@@ -926,9 +917,9 @@ static int mipi_dsi_panel_power(int on)
 			}
 			hr_msleep(1);
 			gpio_set_value_cansleep(gpio37, 1);
-			hr_msleep(2);  
+			hr_msleep(2);	
 			gpio_set_value_cansleep(gpio36, 1);
-			hr_msleep(7);  
+			hr_msleep(7);	
 			gpio_set_value(LCD_RST, 1);
 
 			
@@ -981,13 +972,13 @@ static int mipi_dsi_panel_power(int on)
 #endif
 
 		gpio_set_value(LCD_RST, 0);
-		hr_msleep(3);  
+		hr_msleep(3);	
 
 		gpio_set_value_cansleep(gpio36, 0);
 		hr_msleep(2);
 		gpio_set_value_cansleep(gpio37, 0);
 
-		hr_msleep(8);  
+		hr_msleep(8);	
 		rc = regulator_disable(reg_lvs5);
 		if (rc) {
 			pr_err("disable reg_lvs5 failed, rc=%d\n", rc);
@@ -999,7 +990,6 @@ static int mipi_dsi_panel_power(int on)
 			pr_err("disable reg_l2 failed, rc=%d\n", rc);
 			return -ENODEV;
 		}
-
 	}
 
 	return 0;
@@ -1218,7 +1208,7 @@ static char samsung_ctrl_negative_gamma[70] = {
 		0x20, 0x3C};
 static char samsung_password_l3[3] = { 0xFC, 0x5A, 0x5A }; 
 
-static char samsung_cmd_test[5] = { 0xFF, 0x00, 0x00, 0x00, 0x20 }; 
+static char samsung_cmd_test[5] = { 0xFF, 0x00, 0x00, 0x00, 0x20}; 
 
 static char samsung_panel_exit_sleep[2] = {0x11, 0x00}; 
 #ifdef CABC_DIMMING_SWITCH
@@ -1713,6 +1703,8 @@ static void m7wl_display_on(struct msm_fb_data_type *mfd)
 	cmdreq.cmds = display_on_cmds;
 	cmdreq.cmds_cnt = display_on_cmds_count;
 	cmdreq.flags = CMD_REQ_COMMIT;
+	if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+		cmdreq.flags |= CMD_CLK_CTRL;
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 
@@ -1726,6 +1718,9 @@ static void m7wl_display_off(struct msm_fb_data_type *mfd)
 	cmdreq.cmds = display_off_cmds;
 	cmdreq.cmds_cnt = display_off_cmds_count;
 	cmdreq.flags = CMD_REQ_COMMIT;
+	if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+		cmdreq.flags |= CMD_CLK_CTRL;
+
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 
@@ -1751,6 +1746,9 @@ static void m7wl_dim_on(struct msm_fb_data_type *mfd)
 	cmdreq.cmds_cnt = dim_on_cmds_count;
 
 	cmdreq.flags = CMD_REQ_COMMIT;
+	if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+		cmdreq.flags |= CMD_CLK_CTRL;
+
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 	mipi_dsi_cmdlist_put(&cmdreq);
@@ -1768,7 +1766,6 @@ static int blk_low = 0;
 static unsigned char m7wl_shrink_pwm(int val)
 {
 	unsigned char shrink_br = BRI_SETTING_MAX;
-
 	if(pwmic_ver >= 2)
 		pwm_min = 6;
 	else
@@ -1898,17 +1895,23 @@ static void m7wl_set_backlight(struct msm_fb_data_type *mfd)
                 atomic_set(&lcd_backlight_off, 1);
 		cmdreq.cmds = dim_off_cmds;
 		cmdreq.cmds_cnt = dim_off_cmds_count;
-				cmdreq.flags = CMD_REQ_COMMIT;
-				cmdreq.rlen = 0;
-				cmdreq.cb = NULL;
+		cmdreq.flags = CMD_REQ_COMMIT;
+		if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+			cmdreq.flags |= CMD_CLK_CTRL;
 
-				mipi_dsi_cmdlist_put(&cmdreq);
+		cmdreq.rlen = 0;
+		cmdreq.cb = NULL;
+
+		mipi_dsi_cmdlist_put(&cmdreq);
         } else
                 atomic_set(&lcd_backlight_off, 0);
 #endif
 	cmdreq.cmds = backlight_cmds;
 	cmdreq.cmds_cnt = backlight_cmds_count;
 	cmdreq.flags = CMD_REQ_COMMIT;
+	if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+		cmdreq.flags |= CMD_CLK_CTRL;
+
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 
@@ -1974,6 +1977,9 @@ static void m7wl_color_enhance(struct msm_fb_data_type *mfd, int on)
 		cmdreq.cmds = color_en_on_cmds;
 		cmdreq.cmds_cnt = color_en_on_cmds_count;
 		cmdreq.flags = CMD_REQ_COMMIT;
+		if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+			cmdreq.flags |= CMD_CLK_CTRL;
+
 		cmdreq.rlen = 0;
 		cmdreq.cb = NULL;
 
@@ -1984,6 +1990,9 @@ static void m7wl_color_enhance(struct msm_fb_data_type *mfd, int on)
 		cmdreq.cmds = color_en_off_cmds;
 		cmdreq.cmds_cnt = color_en_off_cmds_count;
 		cmdreq.flags = CMD_REQ_COMMIT;
+		if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+			cmdreq.flags |= CMD_CLK_CTRL;
+
 		cmdreq.rlen = 0;
 		cmdreq.cb = NULL;
 
@@ -2144,6 +2153,9 @@ static void m7wl_sre_ctrl(struct msm_fb_data_type *mfd, unsigned long level)
 		}
 
 		cmdreq.flags = CMD_REQ_COMMIT;
+		if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+			cmdreq.flags |= CMD_CLK_CTRL;
+
 		cmdreq.rlen = 0;
 		cmdreq.cb = NULL;
 		mipi_dsi_cmdlist_put(&cmdreq);
@@ -2235,6 +2247,9 @@ void m7wl_set_cabc (struct msm_fb_data_type *mfd, int mode)
 
 		if (cur_cabc_mode != req_cabc_zoe_mode) {
 			cmdreq.flags = CMD_REQ_COMMIT;
+			if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+				cmdreq.flags |= CMD_CLK_CTRL;
+
 			cmdreq.rlen = 0;
 			cmdreq.cb = NULL;
 			mipi_dsi_cmdlist_put(&cmdreq);
@@ -2250,6 +2265,9 @@ void m7wl_set_cabc (struct msm_fb_data_type *mfd, int mode)
 	}
 
 	cmdreq.flags = CMD_REQ_COMMIT;
+	if (mfd && mfd->panel_info.type == MIPI_CMD_PANEL)
+		cmdreq.flags |= CMD_CLK_CTRL;
+
 	cmdreq.rlen = 0;
 	cmdreq.cb = NULL;
 
