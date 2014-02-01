@@ -1821,10 +1821,6 @@ static void m7wl_set_backlight(struct msm_fb_data_type *mfd)
 #endif
 	int rc;
 
-	if (mdp4_overlay_dsi_state_get() <= ST_DSI_SUSPEND) {
-		return;
-	}
-
 	if ((panel_type == PANEL_ID_M7_JDI_SAMSUNG) ||
 		(panel_type == PANEL_ID_M7_JDI_SAMSUNG_C2) ||
 		(panel_type == PANEL_ID_M7_JDI_SAMSUNG_C2_1) ||
