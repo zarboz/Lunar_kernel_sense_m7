@@ -239,6 +239,35 @@ config ARCH_APQ8064_M7
 	select MSM_CPU_PWRCTL
 	select MSM_IOMMU_GPU_SYNC
 
+config ARCH_APQ8064_DLXP
+	bool "APQ8064_DLXP"
+	select ARCH_MSM_KRAITMP
+	select GPIO_MSM_V2
+	select ARM_GIC
+	select CPU_V7
+	select MSM_SCM if SMP
+	select MSM_GPIOMUX
+	select MSM_REMOTE_SPINLOCK_SFPB
+	select MSM_PIL
+	select MSM_QDSP6_APR
+	select MSM_QDSP6_CODECS
+	select MSM_AUDIO_QDSP6 if SND_SOC
+	select MULTI_IRQ_HANDLER
+	select MSM_RPM
+	select MSM_SPM_V2
+	select MSM_L2_SPM
+	select MSM_PM8X60 if PM
+	select CPU_HAS_L2_PMU
+	select HOLES_IN_ZONE if SPARSEMEM
+	select CLEANCACHE
+	select QCACHE
+	select MIGHT_HAVE_PCI
+	select ARCH_SUPPORTS_MSI
+	select ARM_HAS_SG_CHAIN
+	select MSM_KRAIT_WFE_FIXUP
+	select MSM_IOMMU_GPU_SYNC
+	select MSM_CPU_PWRCTL
+
 config ARCH_MSM8974
 	bool "MSM8974"
 	select ARCH_MSM_KRAITMP
@@ -323,11 +352,23 @@ config MACH_K2_U
 	help
 	  Support for the HTC K2_U
 
+config MACH_TC2
+	depends on ARCH_MSM8930
+	bool "TC2"
+	help
+	  Support for the HTC TC2
+
 config MACH_K2_UL
 	depends on ARCH_MSM8930
 	bool "K2_UL"
 	help
 	  Support for the HTC K2_UL
+
+config MACH_M4_UL
+	depends on ARCH_MSM8930
+	bool "M4_UL"
+	help
+	  Support for the HTC M4_UL
 
 config MACH_EVITA_UTL
         depends on ARCH_MSM8960
@@ -433,7 +474,6 @@ config  ARCH_MSM_SCORPION
 config  ARCH_MSM_KRAIT
 	bool
 	select ARM_L1_CACHE_SHIFT_6
-	select HAVE_EFFICIENT_UNALIGNED_ACCESS
 
 config  MSM_SMP
 	select HAVE_SMP
@@ -1757,9 +1797,12 @@ config MSM_MPDEC_INPUTBOOST_CPUMIN
 	help
 	  This pushes the cpu min speed to predefined values on input events.
 
+config CPU_VOLTAGE_TABLE
+	bool "Enable CPU Voltage Table via sysfs for adjustements"
+	default n
+	help
+	  Krait User Votlage Control
 	  
-
-
 if CPU_FREQ_MSM
 
 config MSM_CPU_FREQ_SET_MIN_MAX
@@ -1780,18 +1823,6 @@ config MSM_CPU_FREQ_MIN
 	default 245760
 
 endif # CPU_FREQ_MSM
-
-config CPU_VOLTAGE_TABLE
-	bool "Enable CPU Voltage Table via sysfs for adjustements"
-	default n
-	help
-	  Krait User Votlage Control
-
-config CMDLINE_OPTIONS
-	bool "Enable cmdline s2w/khz/gov/maxscroff/scheduler command parsing"
-	default n
-	help
-	  This enables the parsing of special cmdline variables.
 
 config MSM_CPU_AVS
 	bool "Enable software controlled Adaptive Voltage Scaling (AVS)"
@@ -2613,7 +2644,6 @@ config MSM_OCMEM
 
 config MSM_RTB
 	bool "Register tracing"
-	depends on (!METRICO_TP || METRICO_TP!=y)
 	help
 	  Add support for logging different events to a small uncached
 	  region. This is designed to aid in debugging reset cases where the
@@ -2783,12 +2813,6 @@ config MSM_HSIC_SYSMON
 	  over HSIC. This driver allows the local system monitor to
 	  communicate with the remote system monitor interface.
 
-config MSM_HSIC_SYSMON_TTY_DEV
-	tristate "MSM HSIC system monitor TTY device"
-	depends on USB && MSM_HSIC_SYSMON
-	help
-	 Add support for using SYSMON interface for specific purpose
-
 config MSM_HSIC_SYSMON_TEST
 	tristate "MSM HSIC system monitor bridge test"
 	depends on USB && MSM_HSIC_SYSMON && DEBUG_FS
@@ -2877,11 +2901,41 @@ config MACH_M7_DUG
         help
           Support for the HTC APQ8064 M7_DUG.
 
+config MACH_M7_DTU
+        depends on ARCH_APQ8064
+        bool "APQ8064 M7_DTU"
+        help
+          Support for the HTC APQ8064 M7_DTU.
+
+config MACH_M7C_DTU
+        depends on ARCH_APQ8064
+        bool "APQ8064 M7C_DTU"
+        help
+          Support for the HTC APQ8064 M7C_DTU.
+
 config MACH_M7_EVM
         depends on ARCH_APQ8064
         bool "APQ8064 M7_EVM"
         help
           Support for the HTC APQ8064 M7_EVM.
+
+config MACH_DLXP_WL
+	depends on ARCH_APQ8064
+	bool "APQ8064 DLXP_WL"
+	help
+	  Support for the HTC APQ8064 DLXP_WL.
+
+config MACH_DLXP_UL
+	depends on ARCH_APQ8064
+	bool "APQ8064 DLXP_UL"
+	help
+	  Support for the HTC APQ8064 DLXP_UL.
+
+config MACH_T6_UL
+        depends on ARCH_APQ8064
+        bool "APQ8064 T6_UL"
+        help
+          Support for the HTC APQ8064 T6_UL.
 
 config QSC_MODEM
         default n
@@ -2950,42 +3004,16 @@ config MSM_CPU_PWRCTL
 	  stand alone power collapse operation. Selecting this option
 	  ensures that they are always off.
 
-config FORCE_FAST_CHARGE
-	bool "Force AC charge mode at will"
-	default y
-	help
-	   A simple sysfs interface to force adapters that
-		are detected as USB to charge as AC.
-
 config QUALCOMM_WLAN_PXO
 	default n
 	bool "Use PXO for WLAN clock source"
 	help
 	  Use PXO for clock source of WLAN chip
 
-config IOEXTENDER		
+config IOEXTENDER
         default n
         bool "Enable IOEXTENDER feature"
 	help
 	 To support IOEXTENDER feature
-
-config CMDLINE_OPTIONS
-	default y
-	bool "cmdline options to help max/minkhz and s2w startup options"
-	help
-		To support misc interfacing options
-
-config UPDATE_LCDC_LUT
-        bool "Set initial Qualcomm LCDC lut"
-        default y
-        help
-          Set initial Qualcomm LCDC Look Up Table.
-
-+config LCD_KCAL
-        tristate "MSM generic LCDC Calibration"
-        default y
-        help
-          Enable MSM generic LCDC temperature Calibration.
-
 endif
 
